@@ -5,18 +5,7 @@ Compress::Huffman - Huffman encode a symbol table
 
 =head1 SYNOPSIS
 
-    # Turn an alphabet in the form of a hash from symbols to
-    # probabilities into a binary Huffman table.
-
-    use Compress::Huffman
-    my $cf = Compress::Huffman->new ();
-    $cf->symbols (\%symbols);
-    my $hufftable = $cf->{h};
-
-    # Turn an alphabet in the form of a hash from symbols to weights
-    # into a tertiary Huffman table.
-
-    $cf->symbols (\%symbols, size => 3, notprob => 1);
+[% INCLUDE "synopsis.pl" | xtidy %]
 
 =head1 VERSION
 
@@ -95,6 +84,8 @@ Any true value turns on debugging messages.
 
 =head2 xl
 
+    my $expected_length = $cf->xl ();
+
 This returns the expected length of the Huffman encoding, which is sum
 of the probability of each symbol multiplied by the length of the code
 associated with that symbol.
@@ -120,5 +111,45 @@ The module is slow for large symbol tables.
 
 Huffman encoding itself does not achieve any compression with, for
 example, two symbols A and B with probabilities 0.001 and 0.999.
+
+=head1 SEE ALSO
+
+=head2 CPAN modules
+
+=over
+
+=item L<Algorithm::Huffman>
+
+Perl extension that implements the Huffman algorithm
+
+Unfortunately this is 14 years old and seems to fail all its tests on
+most platforms.
+
+=back
+
+=head2 Other software
+
+=over
+
+=item L<http://rosettacode.org/wiki/Huffman_coding|Rosetta code examples>
+
+This includes a Perl example.
+
+=head2 References
+
+=over
+
+=item Original article
+
+David A. Huffman, "A Method for the Construction of Minimum-Redundancy
+Codes", Proceedings of the Institute of Radio Engineers, volume 40,
+number 9, pages 1098-1102, September 1952.
+
+=item Elements of Information Theory
+
+I<Elements of Information Theory> by Thomas Cover and Joy Thomas,
+(either the first or second edition) details Huffman encoding.
+
+=back
 
 [% INCLUDE "author" %]
