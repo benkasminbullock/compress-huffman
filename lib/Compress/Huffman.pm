@@ -10,7 +10,7 @@ use strict;
 use Carp;
 use Scalar::Util 'looks_like_number';
 use POSIX qw/ceil/;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # eps is the allowed floating point error for summing the values of
 # the symbol table to ensure they form a probability distribution.
@@ -50,7 +50,11 @@ sub symbols
     # Debugging output switch.
     my $verbose;
     if ($options{verbose}) {
-	$verbose = 1;
+	$o->{verbose} = 1;
+	$o->{verbose} = 1;
+    }
+    else {
+	$o->{verbose} = undef;
     }
     # Check $s is a hash reference.
     if (ref $s ne 'HASH') {
@@ -71,7 +75,7 @@ sub symbols
 	    croak "Non-numerical value '$s->{$k}' for key '$k'";
 	}
     }
-    if ($verbose) {
+    if ($o->{verbose}) {
 	print "Checked for numerical keys.\n";
     }
     my $size = $options{size};
@@ -84,7 +88,7 @@ sub symbols
     if ($size > 10 && ! $options{alphabet}) {
 	croak "Use \$o->symbols (\%t, alphabet => ['a', 'b',...]) for table sizes bigger than 10";
     }
-    if ($verbose) {
+    if ($o->{verbose}) {
 	print "Set size of Huffman code alphabet to $size.\n";
     }
     # If this is supposed to be a probability distribution, check
@@ -97,7 +101,7 @@ sub symbols
 	if (abs ($total - 1.0) > eps) {
 	    croak "Input values don't sum to 1.0; use \$o->symbols (\\\%s, notprob => 1) if not a probability distribution";
 	}
-	if ($verbose) {
+	if ($o->{verbose}) {
 	    print "Is a valid probability distribution (total = $total).\n";
 	}
     }
@@ -108,14 +112,14 @@ sub symbols
     # $t * $size >= $nentries + $t - 1
 
     my $t = ceil (($nentries -1) / ($size - 1));
-    if ($verbose) {
+    if ($o->{verbose}) {
 	print "This symbol table requires $t Huffman tables of size $size.\n";
     }
     my $ndummies = 0;
     if ($size > 2) {
 	# The number of dummy entries we need is
 	my $ndummies = $t * ($size - 1) - $nentries + 1;
-	if ($verbose) {
+	if ($o->{verbose}) {
 	    print "The Huffman tables need $ndummies dummy entries.\n";
 	}
 	if ($ndummies > 0) {
@@ -124,7 +128,8 @@ sub symbols
 	    for (0..$ndummies - 1) {
 		my $dummy = "dummy$_";
 		if ($c{$dummy}) {
-		    croak "The symbol table already has an entry '$dummy'";
+		    # This is a bug not a user error.
+		    die "The symbol table already has an entry '$dummy'";
 		}
 		$c{$dummy} = 0.0;
 	    }
@@ -135,7 +140,7 @@ sub symbols
     my $nfake = 0;
     my %fakes;
     while ($nfake < $t) {
-	if ($verbose) {
+	if ($o->{verbose}) {
 	    print "Making key list for sub-table $nfake / $t.\n";
 	}
 	my $total = 0;
@@ -154,7 +159,7 @@ sub symbols
 		}
 	    }
 	    $total += $min;
-	    if ($verbose) {
+	    if ($o->{verbose}) {
 		print "Choosing $minkey with $min for symbol $i\n";
 	    }
 	    delete $c{$minkey};
@@ -180,7 +185,7 @@ sub symbols
 	$fakes{$fakekey} = \@huff;
 	$nfake++;
     }
-    if ($verbose) {
+    if ($o->{verbose}) {
 	print "Deleting dummy keys.\n";
     }
     for my $k (keys %h) {
@@ -190,6 +195,10 @@ sub symbols
     }
     $o->{h} = \%h;
     $o->{s} = $s;
+    # Blank this out for the case that the user inserts a new symbol
+    # table, etc.
+    $o->{value_re} = undef;
+    $o->{r} = undef;
 }
 
 sub xl
@@ -197,14 +206,67 @@ sub xl
     my ($o) = @_;
     my $h = $o->{h};
     my $s = $o->{s};
-    die unless $h && $s;
+    croak "Bad object" unless $h && $s;
     my $len = 0.0;
     for my $k (keys %$h) {
 	$len += length ($h->{$k}) * $s->{$k};
-	print "$k $h->{$k} $s->{$k} $len\n";
+	if ($o->{verbose}) {
+	    print "$k $h->{$k} $s->{$k} $len\n";
+	}
     }
     return $len;
 }
 
+sub table
+{
+    my ($o) = @_;
+    return $o->{h};
+}
+
+sub encode_array
+{
+    my ($o, $msg) = @_;
+    my @output;
+    for my $k (@$msg) {
+	my $h = $o->{h}{$k};
+	if (! defined $h) {
+	    carp "Symbol '$k' is not in the symbol table";
+	    next;
+	}
+	push @output, $h;
+    }
+    return \@output;
+}
+
+sub encode
+{
+    my ($o, $msg) = @_;
+    my $output = $o->encode_array ($msg);
+    return join '', @$output;
+}
+
+sub decode
+{
+    my ($o, $msg) = @_;
+    if (! $o->{value_re}) {
+	my @values = sort {length ($b) <=> length ($a)} values %{$o->{h}};
+	my $value_re = '(' . join ('|', @values) . ')';
+	$o->{value_re} = $value_re;
+	if ($o->{verbose}) {
+	    print "Value regex is ", $o->{value_re}, "\n";
+	}
+    }
+    if (! $o->{r}) {
+	$o->{r} = {reverse %{$o->{h}}};
+    }
+    my @output;
+    while ($msg =~ s/^$o->{value_re}//) {
+	push @output, $o->{r}{$1};
+    }
+    if (length ($msg) > 0) {
+	carp "Input starting from $msg was not Huffman encoded using this table";
+    }
+    return \@output;
+}
 
 1;

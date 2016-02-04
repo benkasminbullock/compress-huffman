@@ -10,3 +10,4 @@ MYMETA..*
 ^Compress-Huffman-[0-9\.]+\.tar\.gz$
 # File which makes POD documentation from examples.
 ^make-pod\.pl$
+^lib/Compress/Huffman\.pod\.tmpl$

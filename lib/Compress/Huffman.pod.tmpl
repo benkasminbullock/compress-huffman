@@ -1,4 +1,6 @@
 [% start_year = 2015 %]
+=encoding UTF-8
+
 =head1 NAME
 
 Compress::Huffman - Huffman encode a symbol table
@@ -6,6 +8,10 @@ Compress::Huffman - Huffman encode a symbol table
 =head1 SYNOPSIS
 
 [% INCLUDE "synopsis.pl" | xtidy %]
+
+produces output
+
+[% INCLUDE "synopsis-out.txt" | xtidy %]
 
 =head1 VERSION
 
@@ -90,12 +96,29 @@ This returns the expected length of the Huffman encoding, which is sum
 of the probability of each symbol multiplied by the length of the code
 associated with that symbol.
 
-=head2 encode
+=head2 encode_array
 
     my $huffout = $cf->encode (\@string);
 
 Encode the string of symbols in C<@string> into a Huffman-encoded
-format C<$huffout>. The return value is a string.
+format C<$huffout>. The return value is an array reference.
+
+If C<@string> contains a symbol which is not in the symbol table, a
+warning is prted and the symbol is skipped over.
+
+=head2 encode
+
+    my $huffout = $cf->encode (\@string);
+
+Encode the symbols in C<@string> into a Huffman-encoded format
+C<$huffout>. The behaviour is identical to L</encode_array> except
+that the return value is a string.
+
+[% INCLUDE "encode-decode.pl" | xtidy %]
+
+produces output
+
+[% INCLUDE "encode-decode-out.txt" | xtidy %]
 
 =head2 decode
 
@@ -103,11 +126,50 @@ format C<$huffout>. The return value is a string.
 
 Decode the huffman-encoded C<$huffout> into symbols. The return value,
 C<$string> in the example, is an array reference containing the
-symbols supplied in C<symbols>.
+symbols supplied in C<symbols>. Please see L</encode> for an example.
+
+=head2 table
+
+    my $table = $cf->table ();
+
+The return value is a hash reference which is the symbol-to-Huffman
+code table within C<$cf>. This is not a copy, so it shouldn't be
+altered by the user.
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item Bad size $size for Huffman table, must be integer >= 2
+
+(Fatal) The user attempted to make a Huffman table which isn't
+possible.
+
+=item Use $o->symbols (\%t, alphabet => ['a', 'b',...]) for table sizes bigger than 10
+
+(Fatal) The user must supply an alphabet for the Huffman codes if size > 10
+
+=item Symbol table has no entries
+
+(Fatal) User supplied an empty hash reference in L</symbols>.
+
+=item Non-numerical value '$s->{$k}' for key '$k'
+
+(Fatal) User supplied a hash reference with a non-numerical value in
+L</symbols>.
+
+=item Input values don't sum to 1.0; use $o->symbols (\%s, notprob => 1) if not a probability distribution
+
+(Fatal) User supplied a non-probability distribution hash table to
+L</symbols>.
+
+=back
 
 =head1 BUGS
 
-The module is slow for large symbol tables.
+The module is slow for large symbol tables. For example a hash with
+100,000 entries might take several minutes to finish building the
+table.
 
 Huffman encoding itself does not achieve any compression with, for
 example, two symbols A and B with probabilities 0.001 and 0.999.
@@ -131,9 +193,11 @@ most platforms.
 
 =over
 
-=item L<http://rosettacode.org/wiki/Huffman_coding|Rosetta code examples>
+=item L<Rosetta code examples|http://rosettacode.org/wiki/Huffman_coding>
 
 This includes a Perl example.
+
+=back
 
 =head2 References
 

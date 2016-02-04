@@ -1,5 +1,12 @@
 Revision history for Perl module Compress::Huffman
 
+0.02 2016-02-04
+
+- Implement encode and decode
+- Add encode_array method
+- Add table method
+- Add documentation examples
+
 0.01 2016-02-04
 
 - Initial version
