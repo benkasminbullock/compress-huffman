@@ -3,6 +3,7 @@ use warnings;
 use strict;
 use Perl::Build;
 perl_build (
-    pod => ['lib/Compress/Huffman.pod',],
+#    pod => ['lib/Compress/Huffman.pod',],
+make_pod => './make-pod.pl',
 );
 exit;
