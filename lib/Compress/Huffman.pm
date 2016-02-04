@@ -1,18 +1,3 @@
-=encoding UTF-8
-
-=head1 NAME
-
-Compress::Huffman - abstract here.
-
-=head1 SYNOPSIS
-
-    use Compress::Huffman;
-
-=head1 DESCRIPTION
-
-=head1 FUNCTIONS
-
-=cut
 package Compress::Huffman;
 require Exporter;
 @ISA = qw(Exporter);
@@ -25,7 +10,33 @@ use strict;
 use Carp;
 use Scalar::Util 'looks_like_number';
 use POSIX qw/ceil/;
-our $VERSION = 0.01;
+our $VERSION = '0.01';
+
+# eps is the allowed floating point error for summing the values of
+# the symbol table to ensure they form a probability distribution.
+
+use constant 'eps' => 0.0001;
+
+# Private methods/functions
+
+# Add the prefix $i to everything underneath us.
+
+sub addcodetosubtable
+{
+    my ($fakes, $h, $k, $size, $i) = @_;
+    my $subhuff = $fakes->{$k};
+    for my $j (0..$size - 1) {
+	my $subk = $subhuff->[$j];
+	if ($subk =~ /^fake/) {
+	    addcodetosubtable ($fakes, $h, $subk, $size, $i);
+	}
+	else {
+	    $h->{$subk} = $i . $h->{$subk};
+	}
+    }
+}
+
+# Public methods below here
 
 sub new
 {
@@ -83,7 +94,7 @@ sub symbols
 	for my $k (keys %$s) {
 	    $total += $s->{$k};
 	}
-	if (abs ($total - 1.0) > 0.0001) {
+	if (abs ($total - 1.0) > eps) {
 	    croak "Input values don't sum to 1.0; use \$o->symbols (\\\%s, notprob => 1) if not a probability distribution";
 	}
 	if ($verbose) {
@@ -124,9 +135,34 @@ sub symbols
     my $nfake = 0;
     my %fakes;
     while ($nfake < $t) {
-	my @keys = sort {$c{$a} <=> $c{$b}} keys %c;
-	# The total weight of this table.
+	if ($verbose) {
+	    print "Making key list for sub-table $nfake / $t.\n";
+	}
 	my $total = 0;
+	my @keys;
+
+	# Find the $size keys with the minimum value and go through,
+	# picking them out.
+
+	for my $i (0..$size - 1) {
+	    my $min = 'inf';
+	    my $minkey;
+	    for my $k (keys %c) {
+		if ($c{$k} < $min) {
+		    $min = $c{$k};
+		    $minkey = $k;
+		}
+	    }
+	    $total += $min;
+	    if ($verbose) {
+		print "Choosing $minkey with $min for symbol $i\n";
+	    }
+	    delete $c{$minkey};
+	    push @keys, $minkey;
+	    $h{$minkey} = $i;
+	}
+#	my @keys = sort {$c{$a} <=> $c{$b}} keys %c;
+	# The total weight of this table.
 	# The next table
 	my @huff;
 	for my $i (0..$size - 1) {
@@ -134,19 +170,18 @@ sub symbols
 	    if (! defined $k) {
 		last;
 	    }
-#	    print "$i: $k $c{$k}\n";
 	    push @huff, $k;
 	    if ($k =~ /^fake/) {
 		addcodetosubtable (\%fakes, \%h, $k, $size, $i);
 	    }
-	    $total += $c{$k};
-	    delete $c{$k};
-	    $h{$k} = $i;
 	}
 	my $fakekey = 'fake'.$nfake;
 	$c{$fakekey} = $total;
 	$fakes{$fakekey} = \@huff;
 	$nfake++;
+    }
+    if ($verbose) {
+	print "Deleting dummy keys.\n";
     }
     for my $k (keys %h) {
 	if ($k =~ /fake|dummy/) {
@@ -171,21 +206,5 @@ sub xl
     return $len;
 }
 
-# Add the prefix $i to everything underneath us.
-
-sub addcodetosubtable
-{
-    my ($fakes, $h, $k, $size, $i) = @_;
-    my $subhuff = $fakes->{$k};
-    for my $j (0..$size - 1) {
-	my $subk = $subhuff->[$j];
-	if ($subk =~ /^fake/) {
-	    addcodetosubtable ($fakes, $h, $subk, $size, $i);
-	}
-	else {
-	    $h->{$subk} = $i . $h->{$subk};
-	}
-    }
-}
 
 1;

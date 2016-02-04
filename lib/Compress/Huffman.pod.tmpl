@@ -1,0 +1,122 @@
+=head1 NAME
+
+Compress::Huffman - Huffman encode a symbol table
+
+=head1 SYNOPSIS
+
+    # Turn an alphabet in the form of a hash from symbols to
+    # probabilities into a binary Huffman table.
+
+    use Compress::Huffman
+    my $cf = Compress::Huffman->new ();
+    $cf->symbols (\%symbols);
+    my $hufftable = $cf->{h};
+
+    # Turn an alphabet in the form of a hash from symbols to weights
+    # into a tertiary Huffman table.
+
+    $cf->symbols (\%symbols, size => 3, notprob => 1);
+
+=head1 VERSION
+
+This documents version [% version %] of Compress::Huffman corresponding to git
+commit [% commit.commit %] released on [% commit.date %].
+
+=head1 DESCRIPTION
+
+Compress::Huffman converts a table of symbols and probabilities to a
+Huffman encoded form.
+
+=head1 METHODS
+
+=head2 new
+
+    my $cf = Compress::Huffman->new ();
+
+This returns a new object.
+
+=head2 symbols
+
+    $cf->symbols (\%symbols);
+
+This converts a table of symbols into a Huffman code. The keys of
+C<%symbols> are any set of symbols you want to encode. The values of
+C<%symbols> must be numeric. Usually a Huffman code is used to
+compress a set of symbols associated with probability values, so
+usually the numerical values of C<%symbols> should sum to one. There
+is an option L</notprob> which must be specified if the values of
+C<%symbols> do not sum to one.
+
+This method takes the following options, supplied as a hash after the
+initial hash reference:
+
+=over
+
+=item size
+
+    $cf->symbols (\%symbols, size => 3);
+
+This specifies the size of the output. Without any symbols specified,
+the default is binary output, in other words the default value for
+C<size> is two.
+
+=item notprob
+
+    my %symbols = (a => 1, b => 2, c => 3);
+    $cf->symbols (\%symbols, notprob => 1);
+
+This specifies that the values of C<%symbols> are not a probability
+distribution. The function then calculates the probabilities of each
+symbol by summing the values of C<%symbols> and dividing each value by
+the calculated sum. In either case, the values of C<%symbols> must be
+numeric. The numericness of each value is checked using
+C<looks_like_number> from L<Scalar::Util>.
+
+=item alphabet
+
+    $cf->symbols (\%symbols, alphabet => ['a', 'b', 'c']);
+
+The default behaviour of L</symbols> is to form a Huffman code using
+digits. The default Huffman code with L</size> equal to two (binary
+Huffman encoding) encodes C<%symbols> using a string consisting of 0's
+and 1's. For a different encoding, or if you set size to a value more
+than ten, specify the alphabet of symbols using C<alphabet =>
+\@alphabet>, where C<@alphabet> is the list of symbols you want to
+use.
+
+=item verbose
+
+    $cf->symbols (\%symbols, verbose => 1);
+
+Any true value turns on debugging messages.
+
+=back
+
+=head2 xl
+
+This returns the expected length of the Huffman encoding, which is sum
+of the probability of each symbol multiplied by the length of the code
+associated with that symbol.
+
+=head2 encode
+
+    my $huffout = $cf->encode (\@string);
+
+Encode the string of symbols in C<@string> into a Huffman-encoded
+format C<$huffout>. The return value is a string.
+
+=head2 decode
+
+    my $string = $cf->decode ($huffout);
+
+Decode the huffman-encoded C<$huffout> into symbols. The return value,
+C<$string> in the example, is an array reference containing the
+symbols supplied in C<symbols>.
+
+=head1 BUGS
+
+The module is slow for large symbol tables.
+
+Huffman encoding itself does not achieve any compression with, for
+example, two symbols A and B with probabilities 0.001 and 0.999.
+

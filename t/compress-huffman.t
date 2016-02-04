@@ -24,7 +24,12 @@ my %t = (
     f => 0.3,
     g => 0.4,
 );
-$n->symbols (\%t);
+$n->symbols (\%t, verbose => 1);
+my $h = $n->{h};
+for my $sym ('a'..'f') {
+    my $next = chr (ord ($sym) + 1);
+    ok (length ($h->{$sym} >= length ($h->{$next})), "length ordering $sym $next OK");
+}
 $n->symbols (\%t, size => 3, verbose => 1);
 $n->symbols (\%t, size => 4, verbose => 1);
 #$n->symbols (\%t, size => 99, verbose => 1);
