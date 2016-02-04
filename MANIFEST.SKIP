@@ -11,3 +11,4 @@ MYMETA..*
 # File which makes POD documentation from examples.
 ^make-pod\.pl$
 ^lib/Compress/Huffman\.pod\.tmpl$
+^examples/*-out\.txt$

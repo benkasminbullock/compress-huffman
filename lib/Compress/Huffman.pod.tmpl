@@ -104,7 +104,7 @@ Encode the string of symbols in C<@string> into a Huffman-encoded
 format C<$huffout>. The return value is an array reference.
 
 If C<@string> contains a symbol which is not in the symbol table, a
-warning is prted and the symbol is skipped over.
+warning is printed and the symbol is skipped over.
 
 =head2 encode
 
@@ -135,6 +135,90 @@ symbols supplied in C<symbols>. Please see L</encode> for an example.
 The return value is a hash reference which is the symbol-to-Huffman
 code table within C<$cf>. This is not a copy, so it shouldn't be
 altered by the user.
+
+=head1 ALGORITHM
+
+(This is copied from the documentation of L<Algorithm::Huffman>)
+
+Here is an example illustrating the algorithm. Given the characters
+and occurences
+
+    a(15) b(7) c(6) d(6) e(5),
+
+in the first step e and d are the rarest symbols, so we create this
+new heap and tree structure:
+
+    a(15) de(11) b(7) c(6)
+
+          de
+         /  \
+     "0"/    \"1"
+       d      e
+
+Next we repeat this to combine the next two rarest characters, b and c:
+
+    a(15) bc(13) de(11)
+
+          de                bc
+         /  \              /  \
+     "0"/    \"1"      "0"/    \"1"
+       d      e          b      c
+
+Next we repeat this to combine the next two rarest characters, bc and
+de.
+
+    a(15) bcde(24)
+
+                  bcde
+                /      \
+           "0"/          \"1"
+            /              \
+          de                bc
+         /  \              /  \
+     "0"/    \"1"      "0"/    \"1"
+       d      e          b      c
+
+The next step unifies all the steps:
+
+                               Huffman-Table
+                                  /    \
+                            "0"/          \"1"
+                           /                  \
+                       /                          \
+                  bcde                              a
+                /      \
+           "0"/          \"1"
+            /              \
+          de                bc
+         /  \              /  \
+     "0"/    \"1"      "0"/    \"1"
+       d      e          b      c
+
+
+Finally this encoding table is created from the labels on the
+branches:
+
+     a    1
+     b    010
+     c    011
+     d    000
+     e    001
+
+Huffman coding is ambiguous, and there is no rule defining what
+element in the tree is ordered to the left or right, so it's also
+possible to reverse the 0s and 1s to get:
+
+     a    0
+     b    100
+     c    101
+     d    110
+     e    111
+
+In the case of non-binary Huffman encodings, dummy elements may also
+have to be added to the tree.
+
+Please see L</References> for more information about Huffman
+encodings.
 
 =head1 DIAGNOSTICS
 
