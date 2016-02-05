@@ -1,5 +1,10 @@
 Revision history for Perl module Compress::Huffman
 
+0.03 2016-02-05
+
+- Check individual inputs are positive
+- Improve documentation
+
 0.02 2016-02-04
 
 - Implement encode and decode

@@ -10,7 +10,7 @@ use strict;
 use Carp;
 use Scalar::Util 'looks_like_number';
 use POSIX qw/ceil/;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # eps is the allowed floating point error for summing the values of
 # the symbol table to ensure they form a probability distribution.
@@ -93,9 +93,21 @@ sub symbols
     }
     # If this is supposed to be a probability distribution, check
     my $notprob = $options{notprob};
-    if (! $notprob) {
+    if ($notprob) {
+	for my $k (keys %$s) {
+	    my $value = $s->{$k};
+	    if ($value < 0.0) {
+		croak "Negative weight $value for symbol $k";
+	    }
+	}
+    }
+    else {
 	my $total = 0.0;
 	for my $k (keys %$s) {
+	    my $value = $s->{$k};
+	    if ($value < 0.0 || $value > 1.0) {
+		croak "Value $value for symbol $k is not a probability; use \$o->symbols (\\\%s, notprob => 1) if not a probability distribution";
+	    }
 	    $total += $s->{$k};
 	}
 	if (abs ($total - 1.0) > eps) {

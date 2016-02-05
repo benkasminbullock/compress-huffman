@@ -76,8 +76,8 @@ The default behaviour of L</symbols> is to form a Huffman code using
 digits. The default Huffman code with L</size> equal to two (binary
 Huffman encoding) encodes C<%symbols> using a string consisting of 0's
 and 1's. For a different encoding, or if you set size to a value more
-than ten, specify the alphabet of symbols using C<alphabet =>
-\@alphabet>, where C<@alphabet> is the list of symbols you want to
+than ten, specify the alphabet of symbols using C<< alphabet =>
+\@alphabet >>, where C<@alphabet> is the list of symbols you want to
 use.
 
 =item verbose
@@ -92,9 +92,10 @@ Any true value turns on debugging messages.
 
     my $expected_length = $cf->xl ();
 
-This returns the expected length of the Huffman encoding, which is sum
-of the probability of each symbol multiplied by the length of the code
-associated with that symbol.
+This returns the expected length of the Huffman encoding, which is the
+sum of the probability of each symbol multiplied by the length of the
+code associated with that symbol. Please see, for example, L</Elements
+of Information Theory> for details.
 
 =head2 encode_array
 
@@ -246,6 +247,30 @@ L</symbols>.
 
 (Fatal) User supplied a non-probability distribution hash table to
 L</symbols>.
+
+=item Symbol 'X' is not in the symbol table
+
+(Warning) The user tried to encode a list of symbols with L</encode>
+which contained a symbol C<X> which was not in the symbol table.
+
+=item Input starting from XYZ was not Huffman encoded using this table
+
+(Warning) The user tried to decode a Huffman-encoded string with
+L</decode>, but it doesn't seem to have been encoded using the table
+associated with the object.
+
+=item Bad object
+
+(Fatal) A user-supplied object didn't contain the correct tables.
+
+=item Value N for symbol X is not a probability
+
+(Fatal) A user-supplied value for symbol X was either greater than 1
+or less than 0, and the user did not specify "notprob".
+
+=item Negative weight N for symbol X
+
+(Fatal) The weighting for symbol X was negative.
 
 =back
 
