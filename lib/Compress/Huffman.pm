@@ -51,7 +51,6 @@ sub symbols
     my $verbose;
     if ($options{verbose}) {
 	$o->{verbose} = 1;
-	$o->{verbose} = 1;
     }
     else {
 	$o->{verbose} = undef;
