@@ -1,5 +1,9 @@
 Revision history for Perl module Compress::Huffman
 
+0.04 2016-08-24
+
+- Add save and load methods
+
 0.03 2016-02-05
 
 - Check individual inputs are positive
