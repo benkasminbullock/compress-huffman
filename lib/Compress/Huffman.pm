@@ -10,7 +10,9 @@ use strict;
 use Carp;
 use Scalar::Util 'looks_like_number';
 use POSIX qw/ceil/;
-our $VERSION = '0.03';
+use JSON::Create '0.22', 'create_json';
+use JSON::Parse '0.42', 'parse_json';
+our $VERSION = '0.04';
 
 # eps is the allowed floating point error for summing the values of
 # the symbol table to ensure they form a probability distribution.
@@ -280,5 +282,21 @@ sub decode
     }
     return \@output;
 }
+
+sub save
+{
+    my ($o) = @_;
+    return create_json ($o);
+}
+
+sub load
+{
+    my ($o, $data) = @_;
+    my $input = parse_json ($data);
+    for my $k (keys %$input) {
+	$o->{$k} = $input->{$k};
+    }
+}
+
 
 1;

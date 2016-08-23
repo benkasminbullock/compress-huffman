@@ -15,6 +15,8 @@ WriteMakefile (
     LICENSE => 'perl',
     PREREQ_PM => {
 	'Scalar::Util' => 0,
+	'JSON::Create' => '0.22',
+	'JSON::Parse' => '0.42',
     },
     META_MERGE => {
 	'meta-spec' => {

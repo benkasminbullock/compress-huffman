@@ -137,6 +137,23 @@ The return value is a hash reference which is the symbol-to-Huffman
 code table within C<$cf>. This is not a copy, so it shouldn't be
 altered by the user.
 
+=head2 save
+
+    my $saved = $n->save ();
+
+Save the Huffman table in JSON format to C<$saved>.
+
+This was added in version 0.04.
+
+=head2 load
+
+    my $n = Compress::Huffman->new ();
+    $n->load ($saved);
+
+Load a Huffman table in JSON format from C<$saved>.
+
+This was added in version 0.04.
+
 =head1 ALGORITHM
 
 (This is copied from the documentation of L<Algorithm::Huffman>)
@@ -156,7 +173,7 @@ new heap and tree structure:
      "0"/    \"1"
        d      e
 
-Next we repeat this to combine the next two rarest characters, b and c:
+Now combine the next two rarest characters, b and c:
 
     a(15) bc(13) de(11)
 
@@ -165,8 +182,7 @@ Next we repeat this to combine the next two rarest characters, b and c:
      "0"/    \"1"      "0"/    \"1"
        d      e          b      c
 
-Next we repeat this to combine the next two rarest characters, bc and
-de.
+Now combine the next two rarest characters, bc and de.
 
     a(15) bcde(24)
 
@@ -282,6 +298,12 @@ table.
 
 Huffman encoding itself does not achieve any compression with, for
 example, two symbols A and B with probabilities 0.001 and 0.999.
+
+=head1 DEPENDENCIES
+
+L<JSON::Parse> and L<JSON::Create> are used by L</save> and L</load>
+for storing the Huffman table. The module also uses the core modules
+L<Carp>, L<Scalar::Util> for detecting numbers, and L<POSIX>.
 
 =head1 SEE ALSO
 
