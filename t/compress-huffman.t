@@ -4,6 +4,7 @@ use warnings;
 use strict;
 use Test::More;
 use Compress::Huffman;
+my $eps = 0.0001;
 my $n = Compress::Huffman->new ();
 ok ($n, "Made object");
 my %s = (
@@ -15,6 +16,9 @@ eval {
     $n->symbols (\%s, notprob => 1, verbose => 1);
 };
 ok (! $@, "Made symbol table");
+my $xl = $n->xl ();
+ok ($xl > 1.5 - $eps && $xl < 1.5 + $eps, "expected length about 1.5");
+
 my %t = (
     a => 0.01,
     b => 0.02,

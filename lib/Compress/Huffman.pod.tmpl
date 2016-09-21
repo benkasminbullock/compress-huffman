@@ -37,11 +37,11 @@ This returns a new object.
 
 This converts a table of symbols into a Huffman code. The keys of
 C<%symbols> are any set of symbols you want to encode. The values of
-C<%symbols> must be numeric. Usually a Huffman code is used to
+C<%symbols> must be numeric (this is checked with
+L<Scalar::Util/looks_like_number>). Usually a Huffman code is used to
 compress a set of symbols associated with probability values, so
-usually the numerical values of C<%symbols> should sum to one. There
-is an option L</notprob> which must be specified if the values of
-C<%symbols> do not sum to one.
+usually the numerical values of C<%symbols> should sum to one. If the
+values of C<%symbols> do not sum to one, use the L</notprob> option.
 
 This method takes the following options, supplied as a hash after the
 initial hash reference:
@@ -52,9 +52,11 @@ initial hash reference:
 
     $cf->symbols (\%symbols, size => 3);
 
-This specifies the size of the output. Without any symbols specified,
-the default is binary output, in other words the default value for
-C<size> is two.
+This specifies the size of the output alphabet. Without any symbols
+specified, the default is binary output, in other words the default
+value for C<size> is two. For values of C<size> up to 10, the numerals
+0 to 9 are used to encode the output. If C<size> is greater than 10,
+specify an alphabet with the L</alphabet> option.
 
 =item notprob
 
@@ -65,8 +67,7 @@ This specifies that the values of C<%symbols> are not a probability
 distribution. The function then calculates the probabilities of each
 symbol by summing the values of C<%symbols> and dividing each value by
 the calculated sum. In either case, the values of C<%symbols> must be
-numeric. The numericness of each value is checked using
-C<looks_like_number> from L<Scalar::Util>.
+numeric.
 
 =item alphabet
 
@@ -303,7 +304,8 @@ example, two symbols A and B with probabilities 0.001 and 0.999.
 
 L<JSON::Parse> and L<JSON::Create> are used by L</save> and L</load>
 for storing the Huffman table. The module also uses the core modules
-L<Carp>, L<Scalar::Util> for detecting numbers, and L<POSIX>.
+L<Carp>, L<Scalar::Util/looks_like_number> for detecting numbers, and
+L<POSIX/ceil> to calculate the size of tables needed in encoding.
 
 =head1 SEE ALSO
 
@@ -315,7 +317,9 @@ L<Carp>, L<Scalar::Util> for detecting numbers, and L<POSIX>.
 
 Perl extension that implements the Huffman algorithm
 
-Unfortunately this is 14 years old and seems to fail all its tests on
+Unfortunately this is [% 2016 - 2002 %] years old and L<seems to
+fail all its
+tests|http://matrix.cpantesters.org/?dist=Algorithm-Huffman+0.09> on
 most platforms.
 
 =back
