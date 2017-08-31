@@ -1,3 +1,14 @@
+[% MACRO example(file) BLOCK %]
+[%- pl =  file _ ".pl" -%]
+[%- out = file _ "-out.txt" -%]
+[% INCLUDE $pl | xtidy %]
+
+produces output
+
+[% INCLUDE $out | xtidy %]
+
+(This example is included as L<F<[% pl %]>|https://fastapi.metacpan.org/source/BKB/XS-Check-[% info.version %]/examples/[% pl %]> in the distribution.)
+[% END %]
 [% start_year = 2015 %]
 =encoding UTF-8
 
@@ -7,16 +18,13 @@ Compress::Huffman - Huffman encode a symbol table
 
 =head1 SYNOPSIS
 
-[% INCLUDE "synopsis.pl" | xtidy %]
-
-produces output
-
-[% INCLUDE "synopsis-out.txt" | xtidy %]
+[% example("synopsis") %]
 
 =head1 VERSION
 
-This documents version [% version %] of Compress::Huffman corresponding to git
-commit [% commit.commit %] released on [% commit.date %].
+This documents version [% info.version %] of [% info.name %] corresponding to
+L<git commit [% commit.commit %]|[% info.repo %]/commit/[%
+commit.commit %]> released on [% commit.date %].
 
 =head1 DESCRIPTION
 
@@ -320,7 +328,7 @@ L<POSIX/ceil> to calculate the size of tables needed in encoding.
 
 Perl extension that implements the Huffman algorithm
 
-Unfortunately this is [% 2016 - 2002 %] years old and L<seems to
+Unfortunately this is [% 2017 - 2002 %] years old and L<seems to
 fail all its
 tests|http://matrix.cpantesters.org/?dist=Algorithm-Huffman+0.09> on
 most platforms.
