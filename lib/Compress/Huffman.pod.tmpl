@@ -297,8 +297,11 @@ The module is slow for large symbol tables. For example a hash with
 100,000 entries might take several minutes to finish building the
 table.
 
-Huffman encoding itself does not achieve any compression with, for
-example, two symbols A and B with probabilities 0.001 and 0.999.
+Huffman encoding itself does not achieve any compression when there
+are, for example, two symbols A and B with probabilities 0.001 and
+0.999, since every symbol takes at least one bit of information to
+encode. Arithmetic encoding and asymmetric numeral systems are two
+forms of encoding designed to overcome this issue.
 
 =head1 DEPENDENCIES
 
@@ -321,6 +324,13 @@ Unfortunately this is [% 2016 - 2002 %] years old and L<seems to
 fail all its
 tests|http://matrix.cpantesters.org/?dist=Algorithm-Huffman+0.09> on
 most platforms.
+
+=item L<Compress::Huffman::Binary>
+
+This module is by the same author as Compress::Huffman. It is intended
+to compute the binary case of Huffman encoding. It's written in C and
+should be faster than this module, but as of version [% info.version
+%], it is not complete.
 
 =back
 
