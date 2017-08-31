@@ -49,8 +49,6 @@ sub symbols
 {
     # Object and the table of symbols.
     my ($o, $s, %options) = @_;
-    # Debugging output switch.
-    my $verbose;
     if ($options{verbose}) {
 	$o->{verbose} = 1;
     }
