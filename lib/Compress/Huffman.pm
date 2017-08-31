@@ -165,7 +165,7 @@ sub symbols
 	for my $i (0..$size - 1) {
 	    my $min = 'inf';
 	    my $minkey;
-	    for my $k (keys %c) {
+	    for my $k (sort keys %c) {
 		if ($c{$k} < $min) {
 		    $min = $c{$k};
 		    $minkey = $k;
