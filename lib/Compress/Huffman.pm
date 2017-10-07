@@ -93,13 +93,11 @@ sub symbols
     # If this is supposed to be a probability distribution, check
     my $notprob = $options{notprob};
     if ($notprob) {
-	my $total = 0.0;
 	for my $k (keys %$s) {
 	    my $value = $s->{$k};
 	    if ($value < 0.0) {
 		croak "Negative weight $value for symbol $k";
 	    }
-	    $total += $value;
 	}
     }
     else {
