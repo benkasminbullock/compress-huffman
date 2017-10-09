@@ -168,7 +168,7 @@ sub symbols
 	    # http://www.cpantesters.org/cpan/report/314e30b0-6bfb-1014-8e6c-c1e3e4f7669d
 	    my $min = 9**9**9;
 	    my $minkey;
-	    for my $k (sort keys %c) {
+	    for my $k (keys %c) {
 		if ($c{$k} < $min) {
 		    $min = $c{$k};
 		    $minkey = $k;
