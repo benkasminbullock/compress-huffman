@@ -126,7 +126,6 @@ sub symbols
     if ($o->{verbose}) {
 	print "This symbol table requires $t Huffman tables of size $size.\n";
     }
-    my $ndummies = 0;
     if ($size > 2) {
 	# The number of dummy entries we need is
 	my $ndummies = $t * ($size - 1) - $nentries + 1;
