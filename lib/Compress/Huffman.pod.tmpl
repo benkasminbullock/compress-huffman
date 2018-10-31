@@ -29,7 +29,9 @@ commit.commit %]> released on [% commit.date %].
 =head1 DESCRIPTION
 
 Compress::Huffman converts a table of symbols and probabilities to a
-Huffman encoded form.
+Huffman encoded form. The Huffman encoding is output as strings using
+a restricted alphabet, so binary encoding is a string of the form
+C<0101> rather than genuine binary.
 
 =head1 METHODS
 
@@ -60,7 +62,7 @@ initial hash reference:
 
     $cf->symbols (\%symbols, size => 3);
 
-This specifies the size of the output alphabet. Without any symbols
+This specifies the size of the output alphabet. If the size is not
 specified, the default is binary output, in other words the default
 value for C<size> is two. For values of C<size> up to 10, the numerals
 0 to 9 are used to encode the output. If C<size> is greater than 10,
@@ -328,7 +330,9 @@ L<POSIX/ceil> to calculate the size of tables needed in encoding.
 
 Perl extension that implements the Huffman algorithm
 
-Unfortunately this is [% 2017 - 2002 %] years old and L<seems to
+[% USE date -%]
+[%- this_year=date.format(date.now, '%Y') -%]
+Unfortunately this is [% this_year - 2002 %] years old and L<seems to
 fail all its
 tests|http://matrix.cpantesters.org/?dist=Algorithm-Huffman+0.09> on
 most platforms.
