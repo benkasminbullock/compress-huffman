@@ -12,7 +12,7 @@ use Scalar::Util 'looks_like_number';
 use POSIX qw/ceil/;
 use JSON::Create '0.22', 'create_json';
 use JSON::Parse '0.42', 'parse_json';
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # eps is the allowed floating point error for summing the values of
 # the symbol table to ensure they form a probability distribution.
