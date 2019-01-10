@@ -158,7 +158,6 @@ sub symbols
 
 	# Find the $size keys with the minimum value and go through,
 	# picking them out.
-
 	for my $i (0..$size - 1) {
 	    # This method is from
 	    # https://stackoverflow.com/questions/1185822/how-do-i-create-or-test-for-nan-or-infinity-in-perl/1185828#1185828
@@ -167,7 +166,7 @@ sub symbols
 	    # http://www.cpantesters.org/cpan/report/314e30b0-6bfb-1014-8e6c-c1e3e4f7669d
 	    my $min = 9**9**9;
 	    my $minkey;
-	    for my $k (keys %c) {
+	    for my $k (sort keys %c) {
 		if ($c{$k} < $min) {
 		    $min = $c{$k};
 		    $minkey = $k;
